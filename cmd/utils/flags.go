@@ -163,6 +163,10 @@ var (
 		Name:  "ropsten",
 		Usage: "Ropsten network: pre-configured proof-of-work test network",
 	}
+	MumbaiFlag = cli.BoolFlag{
+		Name:  "mumbai",
+		Usage: "Mumbai network: pre-configured proof-of-stake test network",
+	}
 	DeveloperFlag = cli.BoolFlag{
 		Name:  "dev",
 		Usage: "Ephemeral proof-of-authority network with a pre-funded developer account, mining enabled",
@@ -785,6 +789,9 @@ func MakeDataDir(ctx *cli.Context) string {
 		if ctx.GlobalBool(YoloV3Flag.Name) {
 			return filepath.Join(path, "yolo-v3")
 		}
+		if ctx.GlobalBool(MumbaiFlag.Name) {
+			return filepath.Join(path, "mumbai")
+		}
 		return path
 	}
 	Fatalf("Cannot determine default data directory, please set manually (--datadir)")
@@ -839,6 +846,8 @@ func setBootstrapNodes(ctx *cli.Context, cfg *p2p.Config) {
 		urls = params.GoerliBootnodes
 	case ctx.GlobalBool(YoloV3Flag.Name):
 		urls = params.YoloV3Bootnodes
+	case ctx.GlobalBool(MumbaiFlag.Name):
+		urls = params.MumbaiBootnodes
 	case cfg.BootstrapNodes != nil:
 		return // already set, don't apply defaults.
 	}
@@ -1281,6 +1290,8 @@ func setDataDir(ctx *cli.Context, cfg *node.Config) {
 		cfg.DataDir = filepath.Join(node.DefaultDataDir(), "goerli")
 	case ctx.GlobalBool(YoloV3Flag.Name) && cfg.DataDir == node.DefaultDataDir():
 		cfg.DataDir = filepath.Join(node.DefaultDataDir(), "yolo-v3")
+	case ctx.GlobalBool(MumbaiFlag.Name) && cfg.DataDir == node.DefaultDataDir():
+		cfg.DataDir = filepath.Join(node.DefaultDataDir(), "mumbai")
 	}
 }
 
@@ -1464,7 +1475,7 @@ func CheckExclusive(ctx *cli.Context, args ...interface{}) {
 // SetEthConfig applies eth-related command line flags to the config.
 func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *ethconfig.Config) {
 	// Avoid conflicting network flags
-	CheckExclusive(ctx, MainnetFlag, DeveloperFlag, RopstenFlag, RinkebyFlag, GoerliFlag, YoloV3Flag)
+	CheckExclusive(ctx, MainnetFlag, DeveloperFlag, RopstenFlag, RinkebyFlag, GoerliFlag, YoloV3Flag, MumbaiFlag)
 	CheckExclusive(ctx, LightServeFlag, SyncModeFlag, "light")
 	CheckExclusive(ctx, DeveloperFlag, ExternalSignerFlag) // Can't use both ephemeral unlocked and external signer
 	if ctx.GlobalString(GCModeFlag.Name) == "archive" && ctx.GlobalUint64(TxLookupLimitFlag.Name) != 0 {
@@ -1490,7 +1501,7 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *ethconfig.Config) {
 		cfg.BorLogs = ctx.GlobalBool(BorLogsFlag.Name)
 	}
 
-  // Cap the cache allowance and tune the garbage collector
+	// Cap the cache allowance and tune the garbage collector
 	mem, err := gopsutil.VirtualMemory()
 	if err == nil {
 		if 32<<(^uintptr(0)>>63) == 32 && mem.Total > 2*1024*1024*1024 {
@@ -1628,6 +1639,12 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *ethconfig.Config) {
 		}
 		cfg.Genesis = core.DefaultGoerliGenesisBlock()
 		SetDNSDiscoveryDefaults(cfg, params.GoerliGenesisHash)
+	case ctx.GlobalBool(MumbaiFlag.Name):
+		if !ctx.GlobalIsSet(NetworkIdFlag.Name) {
+			cfg.NetworkId = 80001
+		}
+		cfg.Genesis = core.DefaultMumbaiGenesisBlock()
+		SetDNSDiscoveryDefaults(cfg, params.MumbaiGenesisHash)
 	case ctx.GlobalBool(YoloV3Flag.Name):
 		if !ctx.GlobalIsSet(NetworkIdFlag.Name) {
 			cfg.NetworkId = new(big.Int).SetBytes([]byte("yolov3x")).Uint64() // "yolov3x"

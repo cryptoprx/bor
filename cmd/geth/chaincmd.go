@@ -64,6 +64,7 @@ It expects the genesis file as argument.`,
 			utils.RinkebyFlag,
 			utils.GoerliFlag,
 			utils.YoloV3Flag,
+			utils.MumbaiFlag,
 		},
 		Category: "BLOCKCHAIN COMMANDS",
 		Description: `
@@ -205,6 +206,7 @@ func initGenesis(ctx *cli.Context) error {
 			utils.Fatalf("Failed to write genesis block: %v", err)
 		}
 		chaindb.Close()
+		fmt.Println("===== hash === ", hash)
 		log.Info("Successfully wrote genesis state", "database", name, "hash", hash)
 	}
 	return nil

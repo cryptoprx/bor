@@ -248,6 +248,8 @@ func (g *Genesis) configOrDefault(ghash common.Hash) *params.ChainConfig {
 		return params.GoerliChainConfig
 	case ghash == params.YoloV3GenesisHash:
 		return params.YoloV3ChainConfig
+	case ghash == params.MumbaiGenesisHash:
+		return params.MumbaiChainConfig
 	default:
 		return params.AllEthashProtocolChanges
 	}
@@ -380,6 +382,20 @@ func DefaultGoerliGenesisBlock() *Genesis {
 		GasLimit:   10485760,
 		Difficulty: big.NewInt(1),
 		Alloc:      decodePrealloc(goerliAllocData),
+	}
+}
+
+// DefaultMumbaiGenesisBlock returns the Mumbai network genesis block.
+func DefaultMumbaiGenesisBlock() *Genesis {
+	return &Genesis{
+		Config:     params.MumbaiChainConfig,
+		Nonce:      0,
+		Timestamp:  1558348305,
+		GasLimit:   10000000,
+		Difficulty: big.NewInt(1),
+		Mixhash:    common.HexToHash("0x0000000000000000000000000000000000000000000000000000000000000000"),
+		Coinbase:   common.HexToAddress("0x0000000000000000000000000000000000000000"),
+		Alloc:      decodePrealloc(mumbaiAllocData),
 	}
 }
 

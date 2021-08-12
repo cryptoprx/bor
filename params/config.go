@@ -32,6 +32,7 @@ var (
 	RinkebyGenesisHash = common.HexToHash("0x6341fd3daf94b748c72ced5a5b26028f2474f5f00d824504e4fa37a75767e177")
 	GoerliGenesisHash  = common.HexToHash("0xbf7e331f7f7c1dd2e05159666b3bf8bc7a8a3a9eb1d518969eab529dd9b88c1a")
 	YoloV3GenesisHash  = common.HexToHash("0xf1f2876e8500c77afcc03228757b39477eceffccf645b734967fe3c7e16967b7")
+	MumbaiGenesisHash  = common.HexToHash("0x7b66506a9ebdbf30d32b43c5f15a3b1216269a1ec3a75aa3182b86176a2b1ca7")
 )
 
 // TrustedCheckpoints associates each known checkpoint with the genesis hash of
@@ -215,6 +216,32 @@ var (
 			common.HexToAddress("0x0DF8fa387C602AE62559cC4aFa4972A7045d6707"), // Guillaume
 		},
 		Threshold: 2,
+	}
+
+	// MumbaiChainConfig contains the chain parameters to run a node on the Mumbai test network.
+	MumbaiChainConfig = &ChainConfig{
+		ChainID:             big.NewInt(80001),
+		HomesteadBlock:      big.NewInt(0),
+		DAOForkBlock:        nil,
+		DAOForkSupport:      true,
+		EIP150Hash:          common.HexToHash("0x0000000000000000000000000000000000000000000000000000000000000000"),
+		EIP150Block:         big.NewInt(0),
+		EIP155Block:         big.NewInt(0),
+		EIP158Block:         big.NewInt(0),
+		ByzantiumBlock:      big.NewInt(0),
+		ConstantinopleBlock: big.NewInt(0),
+		PetersburgBlock:     big.NewInt(0),
+		IstanbulBlock:       big.NewInt(2722000),
+		MuirGlacierBlock:    big.NewInt(2722000),
+		BerlinBlock:         big.NewInt(13996000),
+		Bor: &BorConfig{
+			Period:                2,
+			ProducerDelay:         6,
+			Sprint:                64,
+			BackupMultiplier:      2,
+			ValidatorContract:     "0x0000000000000000000000000000000000001000",
+			StateReceiverContract: "0x0000000000000000000000000000000000001001",
+		},
 	}
 
 	// YoloV3ChainConfig contains the chain parameters to run a node on the YOLOv3 test network.
